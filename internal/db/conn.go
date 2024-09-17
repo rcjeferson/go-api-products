@@ -3,8 +3,12 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"log/slog"
+	"time"
 
 	_ "github.com/lib/pq"
+	"github.com/rcjeferson/go-api-products/internal/model"
 )
 
 const (
@@ -22,15 +26,36 @@ func ConnectDB() (*sql.DB, error) {
 
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 
 	err = db.Ping()
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 
-	fmt.Println("Connected to " + dbname)
+	slog.Info(fmt.Sprintf("Successfully connected on database %s on host %s:%d!", dbname, host, port))
 
 	return db, nil
+}
+
+func Ping(db *sql.DB) model.ServiceMetrics {
+	sm := model.ServiceMetrics{}
+
+	start := time.Now()
+	err := db.Ping()
+	elapsed := time.Since(start)
+
+	sm.Status = "OK"
+	sm.Error = ""
+	sm.Latency = elapsed.String()
+
+	if err != nil {
+		sm.Status = "FAILED"
+		sm.Error = err.Error()
+
+		slog.Error("Failed to Ping Database: " + string(err.Error()))
+	}
+
+	return sm
 }
