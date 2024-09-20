@@ -1,14 +1,23 @@
 package main
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"github.com/rcjeferson/go-api-products/internal/controller"
 	"github.com/rcjeferson/go-api-products/internal/db"
 	"github.com/rcjeferson/go-api-products/internal/repository"
 	"github.com/rcjeferson/go-api-products/internal/usecase"
 )
+
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		slog.Info("The .env file not found!")
+	}
+}
 
 func main() {
 	server := gin.Default()
