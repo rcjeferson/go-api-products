@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -27,6 +28,48 @@ func (p *productController) GetProducts(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, products)
+}
+
+func (p *productController) GetProductById(ctx *gin.Context) {
+	var product model.Product
+
+	err := ctx.ShouldBindUri(&product)
+
+	if err != nil {
+		slog.Error("Error to bind JSON on Get By ID Request: ", err)
+
+		response := model.Response{
+			Message: "id must be a integer number",
+		}
+
+		ctx.JSON(http.StatusBadRequest, response)
+
+		return
+	}
+
+	product, err = p.productUseCase.GetProductById(product.ID)
+	if err != nil {
+		slog.Error("Error to get product by id on GetProductById Controller: ", err)
+
+		response := model.Response{
+			Message: "error to get product",
+		}
+
+		ctx.JSON(http.StatusInternalServerError, response)
+
+		return
+	}
+
+	if product.ID == 0 {
+		response := model.Response{
+			Message: "product not found",
+		}
+		ctx.JSON(http.StatusNotFound, response)
+
+		return
+	}
+
+	ctx.JSON(http.StatusOK, product)
 }
 
 func (p *productController) CreateProduct(ctx *gin.Context) {

@@ -49,6 +49,30 @@ func (pr *ProductRepository) GetProducts() ([]model.Product, error) {
 	return productList, nil
 }
 
+func (pr *ProductRepository) GetProductById(id int) (model.Product, error) {
+	var product model.Product
+
+	query, err := pr.connection.Prepare("SELECT id, name, price FROM product WHERE id = $1")
+	if err != nil {
+		slog.Error("Error while prepare query on GetProductById Repository: ", err)
+		return model.Product{}, err
+	}
+
+	err = query.QueryRow(id).Scan(&product.ID, &product.Name, &product.Price)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return model.Product{}, nil
+		}
+
+		slog.Error("Error while getting product on GetProductById Repository: ", err)
+		return model.Product{}, err
+	}
+
+	query.Close()
+
+	return product, nil
+}
+
 func (pr *ProductRepository) CreateProduct(product model.Product) (int, error) {
 	var id int
 	stmt, err := pr.connection.Prepare("INSERT INTO product(name, price) VALUES($1, $2) RETURNING id")

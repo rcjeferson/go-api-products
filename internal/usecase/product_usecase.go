@@ -21,6 +21,10 @@ func (pu *ProductUseCase) GetProducts() ([]model.Product, error) {
 	return pu.repository.GetProducts()
 }
 
+func (pu *ProductUseCase) GetProductById(id int) (model.Product, error) {
+	return pu.repository.GetProductById(id)
+}
+
 func (pu *ProductUseCase) CreateProduct(product model.Product) (model.Product, error) {
 	id, err := pu.repository.CreateProduct(product)
 

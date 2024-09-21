@@ -33,6 +33,7 @@ func main() {
 	productController := controller.NewProductController(productUseCase)
 
 	server.GET("/products", productController.GetProducts)
+	server.GET("/products/:id", productController.GetProductById)
 	server.POST("/products", productController.CreateProduct)
 
 	// Ping and health endpoints
