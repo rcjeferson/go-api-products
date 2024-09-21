@@ -88,13 +88,23 @@ func (p *productController) CreateProduct(ctx *gin.Context) {
 		return
 	}
 
+	if product.Name == "" || product.Price == 0 {
+		response := model.Response{
+			Message: "name and price must be filled",
+		}
+
+		ctx.JSON(http.StatusBadRequest, response)
+
+		return
+	}
+
 	err = p.productUseCase.CreateProduct(&product)
 
 	if err != nil {
 		slog.Error("Error on usecase while creating product: ", err)
 
 		response := model.Response{
-			Message: "error to create a new product",
+			Message: err.Error(),
 		}
 
 		ctx.JSON(http.StatusInternalServerError, response)
