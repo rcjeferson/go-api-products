@@ -2,7 +2,6 @@ package repository
 
 import (
 	"database/sql"
-	"fmt"
 	"log/slog"
 
 	"github.com/rcjeferson/go-api-products/internal/model"
@@ -23,7 +22,7 @@ func (pr *ProductRepository) GetProducts() ([]model.Product, error) {
 
 	rows, err := pr.connection.Query(query)
 	if err != nil {
-		fmt.Println(err)
+		slog.Error("Error while getting prodycts on GetProducts Repository: ", err)
 		return []model.Product{}, err
 	}
 
@@ -38,7 +37,7 @@ func (pr *ProductRepository) GetProducts() ([]model.Product, error) {
 		)
 
 		if err != nil {
-			fmt.Println(err)
+			slog.Error("Error while getting products on GetProducts Repository: ", err)
 			return []model.Product{}, err
 		}
 

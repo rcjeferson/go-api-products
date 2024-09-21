@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -78,7 +77,7 @@ func (p *productController) CreateProduct(ctx *gin.Context) {
 	err := ctx.BindJSON(&product)
 
 	if err != nil {
-		fmt.Println("Error to bind JSON on Post Request: ", err)
+		slog.Error("Error to bind JSON on Post Request: ", err)
 		ctx.JSON(http.StatusBadRequest, err)
 
 		return
@@ -87,7 +86,7 @@ func (p *productController) CreateProduct(ctx *gin.Context) {
 	insertedProduct, err := p.productUseCase.CreateProduct(product)
 
 	if err != nil {
-		fmt.Println("Error on usecase while creating product: ", err)
+		slog.Error("Error on usecase while creating product: ", err)
 		ctx.JSON(http.StatusInternalServerError, err)
 
 		return
