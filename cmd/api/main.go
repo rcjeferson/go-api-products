@@ -33,7 +33,7 @@ func main() {
 	productController := controller.NewProductController(productUseCase)
 
 	server.GET("/products", productController.GetProducts)
-	server.POST("/product", productController.CreateProduct)
+	server.POST("/products", productController.CreateProduct)
 
 	// Ping and health endpoints
 	server.GET("/ping", func(ctx *gin.Context) {
