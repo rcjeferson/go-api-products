@@ -46,7 +46,7 @@ func (p *productController) GetProductById(ctx *gin.Context) {
 		return
 	}
 
-	product, err = p.productUseCase.GetProductById(product.ID)
+	err = p.productUseCase.GetProductById(&product)
 	if err != nil {
 		slog.Error("Error to get product by id on GetProductById Controller: ", err)
 
@@ -78,20 +78,30 @@ func (p *productController) CreateProduct(ctx *gin.Context) {
 
 	if err != nil {
 		slog.Error("Error to bind JSON on Post Request: ", err)
-		ctx.JSON(http.StatusBadRequest, err)
+
+		response := model.Response{
+			Message: "invalid parameters",
+		}
+
+		ctx.JSON(http.StatusBadRequest, response)
 
 		return
 	}
 
-	insertedProduct, err := p.productUseCase.CreateProduct(product)
+	err = p.productUseCase.CreateProduct(&product)
 
 	if err != nil {
 		slog.Error("Error on usecase while creating product: ", err)
-		ctx.JSON(http.StatusInternalServerError, err)
+
+		response := model.Response{
+			Message: "error to create a new product",
+		}
+
+		ctx.JSON(http.StatusInternalServerError, response)
 
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, insertedProduct)
+	ctx.JSON(http.StatusCreated, product)
 
 }

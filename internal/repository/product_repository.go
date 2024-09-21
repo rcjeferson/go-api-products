@@ -48,47 +48,45 @@ func (pr *ProductRepository) GetProducts() ([]model.Product, error) {
 	return productList, nil
 }
 
-func (pr *ProductRepository) GetProductById(id int) (model.Product, error) {
-	var product model.Product
-
+func (pr *ProductRepository) GetProductById(product *model.Product) error {
 	query, err := pr.connection.Prepare("SELECT id, name, price FROM product WHERE id = $1")
 	if err != nil {
 		slog.Error("Error while prepare query on GetProductById Repository: ", err)
-		return model.Product{}, err
+		return err
 	}
 
-	err = query.QueryRow(id).Scan(&product.ID, &product.Name, &product.Price)
+	err = query.QueryRow(product.ID).Scan(&product.ID, &product.Name, &product.Price)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return model.Product{}, nil
+			product.ID = 0
+			return nil
 		}
 
 		slog.Error("Error while getting product on GetProductById Repository: ", err)
-		return model.Product{}, err
+		return err
 	}
 
 	query.Close()
 
-	return product, nil
+	return nil
 }
 
-func (pr *ProductRepository) CreateProduct(product model.Product) (int, error) {
-	var id int
+func (pr *ProductRepository) CreateProduct(product *model.Product) error {
 	stmt, err := pr.connection.Prepare("INSERT INTO product(name, price) VALUES($1, $2) RETURNING id")
 
 	if err != nil {
 		slog.Error("Error while prepare sql statement on CreateProduct Repository: ", err)
-		return 0, err
+		return err
 	}
 
-	defer stmt.Close()
-
-	err = stmt.QueryRow(product.Name, product.Price).Scan(&id)
+	err = stmt.QueryRow(product.Name, product.Price).Scan(&product.ID)
 
 	if err != nil {
 		slog.Error("Error while executing query on CreateProduct Repository: ", err)
-		return 0, err
+		return err
 	}
 
-	return id, err
+	stmt.Close()
+
+	return nil
 }

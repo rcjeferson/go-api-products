@@ -21,19 +21,17 @@ func (pu *ProductUseCase) GetProducts() ([]model.Product, error) {
 	return pu.repository.GetProducts()
 }
 
-func (pu *ProductUseCase) GetProductById(id int) (model.Product, error) {
-	return pu.repository.GetProductById(id)
+func (pu *ProductUseCase) GetProductById(product *model.Product) error {
+	return pu.repository.GetProductById(product)
 }
 
-func (pu *ProductUseCase) CreateProduct(product model.Product) (model.Product, error) {
-	id, err := pu.repository.CreateProduct(product)
+func (pu *ProductUseCase) CreateProduct(product *model.Product) error {
+	err := pu.repository.CreateProduct(product)
 
 	if err != nil {
 		slog.Error("Error while creating a product on CreateProduct UseCase: ", err)
-		return model.Product{}, err
+		return err
 	}
 
-	product.ID = id
-
-	return product, nil
+	return nil
 }
