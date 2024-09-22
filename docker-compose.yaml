@@ -6,6 +6,7 @@ services:
       context: .
     profiles:
       - with_api
+    cpus: 1
     environment:
       DB_HOST: db
       DB_PORT: 5432
