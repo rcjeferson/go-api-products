@@ -8,7 +8,7 @@ RUN go mod download
 
 COPY . ./
 
-RUN CGO_ENABLED=0 GOOS=linux go build -C cmd/api -o /app/go-api-products
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/go-api-products cmd/api/main.go
 
 
 # Run app
