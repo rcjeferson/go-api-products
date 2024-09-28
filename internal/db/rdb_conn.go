@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/rcjeferson/go-api-products/internal/model"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -64,4 +65,25 @@ func SetCache(key string, value []byte, ttl time.Duration, rdb *redis.Client) {
 	}
 
 	slog.Info(fmt.Sprintf("Cache created for key '%s'", key), err)
+}
+
+func RedisPing(rdb *redis.Client) model.ServiceMetrics {
+	sm := model.ServiceMetrics{}
+
+	start := time.Now()
+	result := rdb.Ping(ctx)
+	elapsed := time.Since(start)
+
+	sm.Status = "OK"
+	sm.Error = ""
+	sm.Latency = elapsed.String()
+
+	if result.Err() != nil {
+		sm.Status = "FAILED"
+		sm.Error = result.String()
+
+		slog.Error("Failed to Ping Redis: " + result.String())
+	}
+
+	return sm
 }

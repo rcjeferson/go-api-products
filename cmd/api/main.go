@@ -51,7 +51,7 @@ func main() {
 		})
 	})
 
-	healthController := controller.NewHealthController(dbConnection)
+	healthController := controller.NewHealthController(dbConnection, rdb, useCache)
 	server.GET("/health", healthController.Check)
 
 	server.Run(":8000")

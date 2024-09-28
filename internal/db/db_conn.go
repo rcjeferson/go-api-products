@@ -40,7 +40,7 @@ func ConnectDB() (*sql.DB, error) {
 	return db, nil
 }
 
-func Ping(db *sql.DB) model.ServiceMetrics {
+func DbPing(db *sql.DB) model.ServiceMetrics {
 	sm := model.ServiceMetrics{}
 
 	start := time.Now()
