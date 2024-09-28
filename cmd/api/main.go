@@ -3,6 +3,8 @@ package main
 import (
 	"log/slog"
 	"net/http"
+	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -22,13 +24,19 @@ func init() {
 func main() {
 	server := gin.Default()
 
+	rdb, _ := db.ConnectRedis()
 	dbConnection, err := db.ConnectDB()
 	if err != nil {
 		panic(err)
 	}
 
+	useCache, err := strconv.ParseBool(os.Getenv("USE_CACHE"))
+	if err != nil {
+		slog.Error("Failed to get USE_CACHE environment variable!")
+	}
+
 	// Product endpoints
-	productRepository := repository.NewProductRepository(dbConnection)
+	productRepository := repository.NewProductRepository(dbConnection, useCache, rdb)
 	productUseCase := usecase.NewProductUseCase(productRepository)
 	productController := controller.NewProductController(productUseCase)
 
